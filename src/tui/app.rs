@@ -93,9 +93,8 @@ mod tests {
         Config {
             telegram_token: "test_token".to_string(),
             openai_api_key: "test_openai".to_string(),
-            anthropic_api_key: "test_anthropic".to_string(),
             people_dir: PathBuf::from("/tmp/test_people"),
-            claude_model: "claude-3-5-haiku-20241022".to_string(),
+            llm_model: "gpt-4o-mini".to_string(),
         }
     }
 

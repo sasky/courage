@@ -5,7 +5,7 @@ use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MessageKind};
 
 use crate::config::Config;
-use crate::llm::{ActionType, AnthropicClient, LlmResponse, ResponseStatus};
+use crate::llm::{ActionType, LlmResponse, OpenAIClient, ResponseStatus};
 use crate::people::{
     generate_person_markdown, read_all_people, update_person_file, write_person_file,
     PersonFrontmatter, PersonSections, Relationships,
@@ -17,23 +17,20 @@ use crate::transcription::WhisperClient;
 pub struct CourageBot {
     config: Config,
     whisper: WhisperClient,
-    claude: AnthropicClient,
+    llm: OpenAIClient,
     state: ConversationState,
 }
 
 impl CourageBot {
     pub fn new(config: Config) -> Self {
         let whisper = WhisperClient::new(config.openai_api_key.clone());
-        let claude = AnthropicClient::new(
-            config.anthropic_api_key.clone(),
-            config.claude_model.clone(),
-        );
+        let llm = OpenAIClient::new(config.openai_api_key.clone(), config.llm_model.clone());
         let state = ConversationState::new();
 
         Self {
             config,
             whisper,
-            claude,
+            llm,
             state,
         }
     }
@@ -131,14 +128,14 @@ impl CourageBot {
         let people_context = read_all_people(&self.config.people_dir).await?;
         let people_list = people_context.to_prompt_list();
 
-        // Send to Claude for processing
+        // Send to LLM for processing
         bot.send_message(chat_id, "Processing...").await?;
 
         let response = self
-            .claude
+            .llm
             .process_transcript(transcript, &people_list)
             .await
-            .context("Failed to process with Claude")?;
+            .context("Failed to process with LLM")?;
 
         self.handle_llm_response(bot, chat_id, transcript, response)
             .await
@@ -159,7 +156,7 @@ impl CourageBot {
             .await?;
 
         let response = self
-            .claude
+            .llm
             .continue_with_clarification(original_transcript, clarification, &people_list)
             .await
             .context("Failed to continue with clarification")?;
@@ -168,7 +165,7 @@ impl CourageBot {
             .await
     }
 
-    /// Handle the response from Claude
+    /// Handle the response from LLM
     async fn handle_llm_response(
         &self,
         bot: &Bot,
@@ -184,7 +181,7 @@ impl CourageBot {
                     .await;
 
                 let question = format!(
-                    "❓ {}\n\n───────────────\n💡 Please reply with more detail",
+                    "? {}\n\n---------------\nPlease reply with more detail",
                     response.message
                 );
                 bot.send_message(chat_id, question).await?;
@@ -242,7 +239,7 @@ impl CourageBot {
                             let filename = action.filename.trim_end_matches(".md");
 
                             write_person_file(&self.config.people_dir, filename, &content).await?;
-                            summaries.push(format!("✨ Created {}", filename));
+                            summaries.push(format!("Created {}", filename));
                         }
 
                         ActionType::Update => {
@@ -259,16 +256,16 @@ impl CourageBot {
                             )
                             .await?;
 
-                            summaries.push(format!("📝 Updated {}", filename));
+                            summaries.push(format!("Updated {}", filename));
                         }
                     }
                 }
 
                 if summaries.is_empty() {
-                    bot.send_message(chat_id, "✅ No changes needed.").await?;
+                    bot.send_message(chat_id, "No changes needed.").await?;
                 } else {
                     let summary = format!(
-                        "✅ Done!\n\n{}\n\n───────────────\n{}",
+                        "Done!\n\n{}\n\n---------------\n{}",
                         summaries.join("\n"),
                         response.message
                     );
@@ -277,7 +274,7 @@ impl CourageBot {
             }
 
             ResponseStatus::Error => {
-                bot.send_message(chat_id, format!("❌ Error: {}", response.message))
+                bot.send_message(chat_id, format!("Error: {}", response.message))
                     .await?;
             }
         }

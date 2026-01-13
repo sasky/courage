@@ -51,7 +51,7 @@ async fn main() -> Result<()> {
     let config = Config::from_env()?;
 
     tracing::info!("People directory: {:?}", config.people_dir);
-    tracing::info!("Claude model: {}", config.claude_model);
+    tracing::info!("LLM model: {}", config.llm_model);
 
     // Ensure people directory exists
     tokio::fs::create_dir_all(&config.people_dir).await?;

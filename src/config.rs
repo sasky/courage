@@ -6,17 +6,14 @@ pub struct Config {
     /// Telegram bot token
     pub telegram_token: String,
 
-    /// OpenAI API key for Whisper transcription
+    /// OpenAI API key for Whisper transcription and LLM
     pub openai_api_key: String,
-
-    /// Anthropic API key for Claude
-    pub anthropic_api_key: String,
 
     /// Path to the People directory (markdown files)
     pub people_dir: PathBuf,
 
-    /// Claude model to use (default: claude-3-5-haiku-20241022)
-    pub claude_model: String,
+    /// LLM model to use (default: gpt-4o-mini)
+    pub llm_model: String,
 }
 
 impl Config {
@@ -30,21 +27,16 @@ impl Config {
         let openai_api_key =
             std::env::var("OPENAI_API_KEY").context("OPENAI_API_KEY must be set")?;
 
-        let anthropic_api_key =
-            std::env::var("ANTHROPIC_API_KEY").context("ANTHROPIC_API_KEY must be set")?;
-
         let people_dir = std::env::var("PEOPLE_DIR").unwrap_or_else(|_| "./People".to_string());
         let people_dir = PathBuf::from(people_dir);
 
-        let claude_model = std::env::var("CLAUDE_MODEL")
-            .unwrap_or_else(|_| "claude-3-5-haiku-20241022".to_string());
+        let llm_model = std::env::var("LLM_MODEL").unwrap_or_else(|_| "gpt-4o-mini".to_string());
 
         Ok(Self {
             telegram_token,
             openai_api_key,
-            anthropic_api_key,
             people_dir,
-            claude_model,
+            llm_model,
         })
     }
 }

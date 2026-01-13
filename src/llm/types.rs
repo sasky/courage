@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::people::{PersonSections, Relationships};
 
-/// Response from Claude after processing a transcript
+/// Response from LLM after processing a transcript
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LlmResponse {
     pub status: ResponseStatus,
@@ -98,33 +98,33 @@ impl From<ActionSections> for PersonSections {
     }
 }
 
-/// Message for Claude API
-#[derive(Debug, Clone, Serialize)]
-pub struct ClaudeMessage {
+/// Message for OpenAI API
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OpenAIMessage {
     pub role: String,
     pub content: String,
 }
 
-/// Request body for Claude API
+/// Request body for OpenAI API
 #[derive(Debug, Clone, Serialize)]
-pub struct ClaudeRequest {
+pub struct OpenAIRequest {
     pub model: String,
-    pub max_tokens: u32,
-    pub messages: Vec<ClaudeMessage>,
+    pub messages: Vec<OpenAIMessage>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub response_format: Option<serde_json::Value>,
 }
 
-/// Response from Claude API
+/// Response from OpenAI API
 #[derive(Debug, Clone, Deserialize)]
-pub struct ClaudeApiResponse {
-    pub content: Vec<ClaudeContent>,
+pub struct OpenAIResponse {
+    pub choices: Vec<OpenAIChoice>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
-#[allow(dead_code)] // Fields are part of API response structure
-pub struct ClaudeContent {
-    #[serde(rename = "type")]
-    pub content_type: String,
-    pub text: String,
+pub struct OpenAIChoice {
+    pub message: OpenAIMessage,
 }
 
 #[cfg(test)]
@@ -300,18 +300,19 @@ mod tests {
     }
 
     #[test]
-    fn test_claude_request_serialization() {
-        let request = ClaudeRequest {
-            model: "claude-3-5-haiku-20241022".to_string(),
-            max_tokens: 4096,
-            messages: vec![ClaudeMessage {
+    fn test_openai_request_serialization() {
+        let request = OpenAIRequest {
+            model: "gpt-4o-mini".to_string(),
+            messages: vec![OpenAIMessage {
                 role: "user".to_string(),
                 content: "Hello".to_string(),
             }],
+            max_tokens: Some(4096),
+            response_format: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
-        assert!(json.contains("claude-3-5-haiku"));
+        assert!(json.contains("gpt-4o-mini"));
         assert!(json.contains("4096"));
         assert!(json.contains("user"));
         assert!(json.contains("Hello"));

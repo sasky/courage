@@ -6,7 +6,7 @@ A personal relationship database with voice input. Send voice memos to a Telegra
 
 - **Voice Input**: Send voice memos via Telegram
 - **Transcription**: Automatic transcription with OpenAI Whisper
-- **Smart Processing**: Claude AI extracts people and relationship data
+- **Smart Processing**: OpenAI extracts people and relationship data
 - **Markdown Files**: Creates/updates Obsidian-compatible markdown files
 - **Bidirectional Relationships**: Automatically links people both ways
 - **Clarification**: Asks when input is ambiguous (e.g., multiple "Johns")
@@ -22,7 +22,7 @@ Transcribe (OpenAI Whisper)
         ↓
 Read existing People/*.md
         ↓
-Process (Claude Haiku)
+Process (OpenAI GPT)
         ↓
 Create/Update markdown files
         ↓
@@ -39,8 +39,7 @@ Confirm via Telegram
 
 ### 2. Get API Keys
 
-- **OpenAI**: https://platform.openai.com/api-keys
-- **Anthropic**: https://console.anthropic.com/
+- **OpenAI**: https://platform.openai.com/api-keys (for Whisper and GPT)
 
 ### 3. Configure Environment
 
@@ -49,7 +48,6 @@ cp .env.example .env
 # Edit .env with your keys:
 # - TELEGRAM_BOT_TOKEN
 # - OPENAI_API_KEY
-# - ANTHROPIC_API_KEY
 # - PEOPLE_DIR (path to your People folder)
 ```
 
@@ -140,10 +138,9 @@ Loves Italian food
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `TELEGRAM_BOT_TOKEN` | Yes | Telegram bot token from BotFather |
-| `OPENAI_API_KEY` | Yes | OpenAI API key for Whisper |
-| `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude |
+| `OPENAI_API_KEY` | Yes | OpenAI API key for Whisper and GPT |
 | `PEOPLE_DIR` | No | Path to People folder (default: `./People`) |
-| `CLAUDE_MODEL` | No | Claude model (default: `claude-3-5-haiku-20241022`) |
+| `LLM_MODEL` | No | LLM model (default: `gpt-4o-mini`) |
 | `RUST_LOG` | No | Log level (default: `courage=info`) |
 
 ## Development
