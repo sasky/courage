@@ -55,7 +55,7 @@
 
 | Phase | Status | Plan | Summary |
 |-------|--------|------|---------|
-| 01-foundation | pending | - | - |
+| 01-foundation | in_progress | [01-01-PLAN](phases/01-foundation/01-01-PLAN.md) | [01-01-SUMMARY](phases/01-foundation/01-01-SUMMARY.md) |
 | 02-ui-layout | pending | - | - |
 | 03-input-processing | pending | - | - |
 | 04-polish | pending | - | - |

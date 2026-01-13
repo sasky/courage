@@ -37,12 +37,10 @@ impl AnthropicClient {
 ## RESPOND WITH VALID JSON ONLY - NO OTHER TEXT"#
         );
 
-        let messages = vec![
-            ClaudeMessage {
-                role: "user".to_string(),
-                content: format!("{}\n\n{}", system_prompt, user_message),
-            },
-        ];
+        let messages = vec![ClaudeMessage {
+            role: "user".to_string(),
+            content: format!("{}\n\n{}", system_prompt, user_message),
+        }];
 
         let request = ClaudeRequest {
             model: self.model.clone(),
@@ -61,7 +59,8 @@ impl AnthropicClient {
             .await?;
 
         let response = handle_api_response(response, "Anthropic").await?;
-        let api_response: ClaudeApiResponse = parse_json_response(response, "Anthropic response").await?;
+        let api_response: ClaudeApiResponse =
+            parse_json_response(response, "Anthropic response").await?;
 
         let text = api_response
             .content
@@ -70,8 +69,8 @@ impl AnthropicClient {
             .unwrap_or_default();
 
         // Parse the JSON response from Claude
-        let llm_response: LlmResponse = serde_json::from_str(&text)
-            .context("Failed to parse LLM response as JSON")?;
+        let llm_response: LlmResponse =
+            serde_json::from_str(&text).context("Failed to parse LLM response as JSON")?;
 
         Ok(llm_response)
     }
@@ -95,12 +94,10 @@ impl AnthropicClient {
 Based on the user's clarification, now process the original transcript and respond with valid JSON."#
         );
 
-        let messages = vec![
-            ClaudeMessage {
-                role: "user".to_string(),
-                content: format!("{}\n\n{}", system_prompt, user_message),
-            },
-        ];
+        let messages = vec![ClaudeMessage {
+            role: "user".to_string(),
+            content: format!("{}\n\n{}", system_prompt, user_message),
+        }];
 
         let request = ClaudeRequest {
             model: self.model.clone(),
@@ -119,7 +116,8 @@ Based on the user's clarification, now process the original transcript and respo
             .await?;
 
         let response = handle_api_response(response, "Anthropic").await?;
-        let api_response: ClaudeApiResponse = parse_json_response(response, "Anthropic response").await?;
+        let api_response: ClaudeApiResponse =
+            parse_json_response(response, "Anthropic response").await?;
 
         let text = api_response
             .content
@@ -127,8 +125,8 @@ Based on the user's clarification, now process the original transcript and respo
             .map(|c| c.text.clone())
             .unwrap_or_default();
 
-        let llm_response: LlmResponse = serde_json::from_str(&text)
-            .context("Failed to parse LLM response as JSON")?;
+        let llm_response: LlmResponse =
+            serde_json::from_str(&text).context("Failed to parse LLM response as JSON")?;
 
         Ok(llm_response)
     }

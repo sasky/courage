@@ -1,7 +1,7 @@
+use chrono::{DateTime, Duration, Utc};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use chrono::{DateTime, Utc, Duration};
 
 /// State for a pending conversation awaiting clarification
 #[derive(Debug, Clone)]
@@ -35,12 +35,7 @@ impl ConversationState {
     }
 
     /// Store a pending conversation awaiting clarification
-    pub async fn set_pending(
-        &self,
-        chat_id: i64,
-        transcript: String,
-        question: String,
-    ) {
+    pub async fn set_pending(&self, chat_id: i64, transcript: String, question: String) {
         let conversation = PendingConversation {
             transcript,
             question,

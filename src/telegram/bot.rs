@@ -1,14 +1,14 @@
 use anyhow::{Context, Result};
 use std::sync::Arc;
-use teloxide::prelude::*;
 use teloxide::net::Download;
+use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MessageKind};
 
 use crate::config::Config;
 use crate::llm::{ActionType, AnthropicClient, LlmResponse, ResponseStatus};
 use crate::people::{
-    read_all_people, generate_person_markdown, write_person_file, update_person_file,
-    PersonFrontmatter, Relationships, PersonSections,
+    generate_person_markdown, read_all_people, update_person_file, write_person_file,
+    PersonFrontmatter, PersonSections, Relationships,
 };
 use crate::state::ConversationState;
 use crate::transcription::WhisperClient;
@@ -70,7 +70,8 @@ impl CourageBot {
             match &common.media_kind {
                 // Voice message
                 MediaKind::Voice(voice) => {
-                    self.handle_voice(bot, chat_id, &voice.voice.file.id).await?;
+                    self.handle_voice(bot, chat_id, &voice.voice.file.id)
+                        .await?;
                 }
                 // Text message
                 MediaKind::Text(text) => {
@@ -154,7 +155,8 @@ impl CourageBot {
         let people_context = read_all_people(&self.config.people_dir).await?;
         let people_list = people_context.to_prompt_list();
 
-        bot.send_message(chat_id, "Processing with clarification...").await?;
+        bot.send_message(chat_id, "Processing with clarification...")
+            .await?;
 
         let response = self
             .claude
@@ -196,14 +198,38 @@ impl CourageBot {
                     match action.action_type {
                         ActionType::Create => {
                             let frontmatter = PersonFrontmatter {
-                                first_name: action.fields.get("first_name").cloned().unwrap_or_default(),
-                                last_name: action.fields.get("last_name").cloned().unwrap_or_default(),
-                                disambiguator: action.fields.get("disambiguator").cloned().unwrap_or_default(),
-                                nickname: action.fields.get("nickname").cloned().unwrap_or_default(),
-                                birthday: action.fields.get("birthday").cloned().unwrap_or_default(),
+                                first_name: action
+                                    .fields
+                                    .get("first_name")
+                                    .cloned()
+                                    .unwrap_or_default(),
+                                last_name: action
+                                    .fields
+                                    .get("last_name")
+                                    .cloned()
+                                    .unwrap_or_default(),
+                                disambiguator: action
+                                    .fields
+                                    .get("disambiguator")
+                                    .cloned()
+                                    .unwrap_or_default(),
+                                nickname: action
+                                    .fields
+                                    .get("nickname")
+                                    .cloned()
+                                    .unwrap_or_default(),
+                                birthday: action
+                                    .fields
+                                    .get("birthday")
+                                    .cloned()
+                                    .unwrap_or_default(),
                                 phone: action.fields.get("phone").cloned().unwrap_or_default(),
                                 email: action.fields.get("email").cloned().unwrap_or_default(),
-                                location: action.fields.get("location").cloned().unwrap_or_default(),
+                                location: action
+                                    .fields
+                                    .get("location")
+                                    .cloned()
+                                    .unwrap_or_default(),
                                 work: action.fields.get("work").cloned().unwrap_or_default(),
                                 ..Default::default()
                             };
@@ -211,7 +237,8 @@ impl CourageBot {
                             let relationships: Relationships = action.relationships.clone().into();
                             let sections: PersonSections = action.sections.clone().into();
 
-                            let content = generate_person_markdown(&frontmatter, &relationships, &sections);
+                            let content =
+                                generate_person_markdown(&frontmatter, &relationships, &sections);
                             let filename = action.filename.trim_end_matches(".md");
 
                             write_person_file(&self.config.people_dir, filename, &content).await?;

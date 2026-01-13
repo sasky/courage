@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::people::{Relationships, PersonSections};
+use crate::people::{PersonSections, Relationships};
 
 /// Response from Claude after processing a transcript
 #[derive(Debug, Clone, Serialize, Deserialize)]

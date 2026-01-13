@@ -72,8 +72,11 @@ async fn test_read_multiple_people() {
             location: location.to_string(),
             ..Default::default()
         };
-        let content =
-            generate_person_markdown(&frontmatter, &Relationships::default(), &PersonSections::default());
+        let content = generate_person_markdown(
+            &frontmatter,
+            &Relationships::default(),
+            &PersonSections::default(),
+        );
         write_person_file(people_dir, name, &content).await.unwrap();
     }
 
@@ -256,8 +259,7 @@ async fn test_bidirectional_relationships() {
         partner: "[[Jane Smith]]".to_string(),
         ..Default::default()
     };
-    let john_content =
-        generate_person_markdown(&john_fm, &john_rel, &PersonSections::default());
+    let john_content = generate_person_markdown(&john_fm, &john_rel, &PersonSections::default());
     write_person_file(people_dir, "John Smith", &john_content)
         .await
         .unwrap();
@@ -272,8 +274,7 @@ async fn test_bidirectional_relationships() {
         partner: "[[John Smith]]".to_string(),
         ..Default::default()
     };
-    let jane_content =
-        generate_person_markdown(&jane_fm, &jane_rel, &PersonSections::default());
+    let jane_content = generate_person_markdown(&jane_fm, &jane_rel, &PersonSections::default());
     write_person_file(people_dir, "Jane Smith", &jane_content)
         .await
         .unwrap();

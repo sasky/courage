@@ -27,10 +27,7 @@ impl WhisperClient {
     /// Transcribe audio data using OpenAI Whisper
     pub async fn transcribe(&self, audio_data: Vec<u8>, filename: &str) -> Result<String> {
         // Determine file extension for content type
-        let extension = filename
-            .rsplit('.')
-            .next()
-            .unwrap_or("ogg");
+        let extension = filename.rsplit('.').next().unwrap_or("ogg");
 
         let mime_type = match extension {
             "ogg" | "oga" => "audio/ogg",
@@ -58,7 +55,8 @@ impl WhisperClient {
             .await?;
 
         let response = handle_api_response(response, "OpenAI").await?;
-        let whisper_response: WhisperResponse = parse_json_response(response, "Whisper response").await?;
+        let whisper_response: WhisperResponse =
+            parse_json_response(response, "Whisper response").await?;
 
         Ok(whisper_response.text)
     }

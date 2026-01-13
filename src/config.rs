@@ -24,17 +24,16 @@ impl Config {
     pub fn from_env() -> Result<Self> {
         dotenvy::dotenv().ok();
 
-        let telegram_token = std::env::var("TELEGRAM_BOT_TOKEN")
-            .context("TELEGRAM_BOT_TOKEN must be set")?;
+        let telegram_token =
+            std::env::var("TELEGRAM_BOT_TOKEN").context("TELEGRAM_BOT_TOKEN must be set")?;
 
-        let openai_api_key = std::env::var("OPENAI_API_KEY")
-            .context("OPENAI_API_KEY must be set")?;
+        let openai_api_key =
+            std::env::var("OPENAI_API_KEY").context("OPENAI_API_KEY must be set")?;
 
-        let anthropic_api_key = std::env::var("ANTHROPIC_API_KEY")
-            .context("ANTHROPIC_API_KEY must be set")?;
+        let anthropic_api_key =
+            std::env::var("ANTHROPIC_API_KEY").context("ANTHROPIC_API_KEY must be set")?;
 
-        let people_dir = std::env::var("PEOPLE_DIR")
-            .unwrap_or_else(|_| "./People".to_string());
+        let people_dir = std::env::var("PEOPLE_DIR").unwrap_or_else(|_| "./People".to_string());
         let people_dir = PathBuf::from(people_dir);
 
         let claude_model = std::env::var("CLAUDE_MODEL")

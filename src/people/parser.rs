@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use std::path::Path;
 
-use super::types::{Person, PersonFrontmatter, PeopleContext, Relationships};
+use super::types::{PeopleContext, Person, PersonFrontmatter, Relationships};
 use crate::utils::markdown::extract_labeled_value;
 
 /// Read all person files from a directory

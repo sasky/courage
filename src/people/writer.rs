@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use chrono::Local;
 use std::path::Path;
 
-use super::types::{PersonFrontmatter, Relationships, PersonSections};
+use super::types::{PersonFrontmatter, PersonSections, Relationships};
 use crate::utils::markdown::relationship_pattern;
 
 /// Generate a new person markdown file
@@ -99,11 +99,7 @@ updated: {}
 }
 
 /// Write a person file to disk
-pub async fn write_person_file(
-    people_dir: &Path,
-    filename: &str,
-    content: &str,
-) -> Result<()> {
+pub async fn write_person_file(people_dir: &Path, filename: &str, content: &str) -> Result<()> {
     // Ensure directory exists
     tokio::fs::create_dir_all(people_dir).await?;
 
@@ -129,7 +125,12 @@ pub async fn update_person_file(
         .await
         .context("Failed to read existing file")?;
 
-    let updated = merge_person_content(&existing, field_updates, relationship_updates, section_updates)?;
+    let updated = merge_person_content(
+        &existing,
+        field_updates,
+        relationship_updates,
+        section_updates,
+    )?;
 
     tokio::fs::write(&path, &updated)
         .await
@@ -169,9 +170,17 @@ fn merge_person_content(
     // Append to sections
     content = append_to_section(&content, "How We Met", &section_updates.how_we_met);
     content = append_to_section(&content, "History", &section_updates.history);
-    content = append_to_section(&content, "Current Situation", &section_updates.current_situation);
+    content = append_to_section(
+        &content,
+        "Current Situation",
+        &section_updates.current_situation,
+    );
     content = append_to_section(&content, "Hobbies & Passions", &section_updates.hobbies);
-    content = append_to_section(&content, "Favourite Media", &section_updates.favourite_media);
+    content = append_to_section(
+        &content,
+        "Favourite Media",
+        &section_updates.favourite_media,
+    );
     content = append_to_section(&content, "Other Notes", &section_updates.other_notes);
 
     Ok(content)
@@ -183,7 +192,8 @@ fn update_frontmatter_field(content: &str, key: &str, value: &str) -> String {
     let re = regex::Regex::new(&pattern).unwrap();
 
     if re.is_match(content) {
-        re.replace(content, format!("{}: {}", key, value)).to_string()
+        re.replace(content, format!("{}: {}", key, value))
+            .to_string()
     } else {
         // Field doesn't exist, add it before the closing ---
         content.replacen("---\n\n", &format!("{}: {}\n---\n\n", key, value), 1)
@@ -211,7 +221,8 @@ fn merge_relationship(content: &str, label: &str, new_value: &str) -> String {
             format!("{}, {}", existing, new_value)
         };
 
-        re.replace(content, format!("**{}:** {}", label, merged)).to_string()
+        re.replace(content, format!("**{}:** {}", label, merged))
+            .to_string()
     } else {
         content.to_string()
     }

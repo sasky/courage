@@ -10,4 +10,5 @@ pub mod people;
 pub mod state;
 pub mod telegram;
 pub mod transcription;
+pub mod tui;
 pub mod utils;

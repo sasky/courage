@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use reqwest::Response;
 
 /// Handle API response errors with consistent formatting
-/// 
+///
 /// Checks if the response was successful, and if not, extracts the error
 /// message and returns a formatted error.
 pub async fn handle_api_response(response: Response, api_name: &str) -> Result<Response> {

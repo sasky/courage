@@ -76,7 +76,10 @@ pub struct Person {
 impl Person {
     /// Get the display name for this person
     pub fn display_name(&self) -> String {
-        let base = format!("{} {}", self.frontmatter.first_name, self.frontmatter.last_name);
+        let base = format!(
+            "{} {}",
+            self.frontmatter.first_name, self.frontmatter.last_name
+        );
         if self.frontmatter.disambiguator.is_empty() {
             base
         } else {
@@ -182,7 +185,10 @@ mod tests {
             relationships: Relationships::default(),
             content: String::new(),
         };
-        assert_eq!(person.summary(), "John Smith - Software Engineer (Wellington)");
+        assert_eq!(
+            person.summary(),
+            "John Smith - Software Engineer (Wellington)"
+        );
     }
 
     #[test]
