@@ -1,160 +1,168 @@
 # Courage
 
-A personal relationship database with voice input. Send voice memos to a Telegram bot, and it will transcribe, process, and update your Obsidian-compatible markdown files.
+Personal relationship database with voice input. Track interactions, notes, and memories about the people in your life.
 
 ## Features
 
-- **Voice Input**: Send voice memos via Telegram
-- **Transcription**: Automatic transcription with OpenAI Whisper
-- **Smart Processing**: OpenAI extracts people and relationship data
-- **Markdown Files**: Creates/updates Obsidian-compatible markdown files
-- **Bidirectional Relationships**: Automatically links people both ways
-- **Clarification**: Asks when input is ambiguous (e.g., multiple "Johns")
+- **Voice Input**: Send voice messages to capture notes hands-free
+- **LLM-Powered**: Intelligent parsing and organization of your notes
+- **People Database**: Markdown-based storage for easy editing and version control
+- **Dual Interface**: Use via Telegram bot or terminal TUI
 
-## Architecture
+## Prerequisites
 
-```
-Telegram Voice Memo
-        ↓
-Download audio file
-        ↓
-Transcribe (OpenAI Whisper)
-        ↓
-Read existing People/*.md
-        ↓
-Process (OpenAI GPT)
-        ↓
-Create/Update markdown files
-        ↓
-Confirm via Telegram
-```
+- Rust 1.70+ (install via [rustup](https://rustup.rs/))
+- OpenAI API key (for transcription and LLM features)
+- Telegram Bot Token (optional, for bot mode)
 
-## Setup
+## Configuration
 
-### 1. Create a Telegram Bot
-
-1. Message [@BotFather](https://t.me/botfather) on Telegram
-2. `/newbot` and follow prompts
-3. Copy the bot token
-
-### 2. Get API Keys
-
-- **OpenAI**: https://platform.openai.com/api-keys (for Whisper and GPT)
-
-### 3. Configure Environment
+Create a `.env` file in the project root:
 
 ```bash
-cp .env.example .env
-# Edit .env with your keys:
-# - TELEGRAM_BOT_TOKEN
-# - OPENAI_API_KEY
-# - PEOPLE_DIR (path to your People folder)
+# Required
+OPENAI_API_KEY=your_openai_api_key
+
+# Optional - for Telegram bot mode
+TELOXIDE_TOKEN=your_telegram_bot_token
+
+# Optional - customize paths and models
+PEOPLE_DIR=./people
+LLM_MODEL=gpt-4o
 ```
 
-### 4. Build and Run
+## Building & Running
+
+All commands should be run from the `courage/` directory.
 
 ```bash
-# Build
+cd courage
+```
+
+### Build
+
+```bash
+# Debug build
+cargo build
+
+# Release build (optimized)
 cargo build --release
-
-# Run
-./target/release/courage
 ```
 
-Or run in development mode:
+### Run
+
+```bash
+# Run TUI mode (terminal interface)
+cargo run -- --tui
+
+# Run Telegram bot mode
+cargo run
+
+# Run release build
+cargo run --release -- --tui
+```
+
+### Install Locally
+
+```bash
+# Install to ~/.cargo/bin
+cargo install --path .
+
+# Then run from anywhere
+courage --tui
+```
+
+## Development
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run tests with output
+cargo test -- --nocapture
+
+# Run a specific test
+cargo test test_name
+
+# Run tests in release mode
+cargo test --release
+```
+
+### Code Quality
+
+```bash
+# Run clippy (linter)
+cargo clippy
+
+# Run clippy with warnings as errors
+cargo clippy -- -D warnings
+
+# Format code
+cargo fmt
+
+# Check formatting without changes
+cargo fmt --check
+```
+
+### Other Useful Commands
+
+```bash
+# Check compilation without building
+cargo check
+
+# View documentation
+cargo doc --open
+
+# Update dependencies
+cargo update
+
+# Show dependency tree
+cargo tree
+
+# Clean build artifacts
+cargo clean
+```
+
+## Project Structure
+
+```
+courage/
+├── src/
+│   ├── main.rs          # Entry point, CLI args
+│   ├── config.rs        # Configuration management
+│   ├── lib.rs           # Library exports
+│   ├── llm/             # LLM integration (OpenAI)
+│   ├── people/          # People database (markdown files)
+│   ├── state/           # Conversation state management
+│   ├── telegram/        # Telegram bot interface
+│   ├── transcription/   # Voice transcription (Whisper)
+│   ├── tui/             # Terminal UI (ratatui)
+│   └── utils/           # Shared utilities
+├── tests/               # Integration tests
+└── Cargo.toml           # Dependencies
+```
+
+## Usage
+
+### TUI Mode
+
+Launch with `--tui` flag for an interactive terminal interface:
+
+```bash
+cargo run -- --tui
+```
+
+### Telegram Bot Mode
+
+Run without flags to start the Telegram bot:
 
 ```bash
 cargo run
 ```
 
-## Usage
-
-### Voice Commands
-
-Send voice messages to your bot:
-
-- "Add a new person John Smith, he works at Google in Wellington"
-- "John's birthday is March 15th"
-- "Sarah is John's wife, she's a designer"
-- "Had coffee with John, he's training for a marathon now"
-
-### Text Commands
-
-You can also type messages directly:
-
-- "Update John Smith: new job at Apple"
-- "John's favorite movie is The Matrix"
-
-### Clarification
-
-When input is ambiguous:
-
-```
-You: "Update John's phone number"
-Bot: "I found two Johns:
-     1. John Smith - works at Google
-     2. John Davies - met at conference
-     Which one?"
-You: "John Smith"
-Bot: "✅ Updated John Smith"
-```
-
-## Person File Format
-
-Files are stored in `People/` as markdown:
-
-```markdown
----
-first_name: John
-last_name: Smith
-location: Wellington
-work: Software Engineer at Google
-birthday: 1985-03-15
-created: 2025-01-02
-updated: 2025-01-02
----
-
-# John Smith
-
-## Relationships
-**Parents:** 
-**Children:** 
-**Siblings:** 
-**Partner:** [[Sarah Smith]]
-**Friends:** [[Bob Jones]]
-
-## How We Met
-Met at a tech conference in 2024
-
-## Hobbies & Passions
-- Marathon training (added 2025-01-02)
-
-## Other Notes
-Loves Italian food
-```
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram bot token from BotFather |
-| `OPENAI_API_KEY` | Yes | OpenAI API key for Whisper and GPT |
-| `PEOPLE_DIR` | No | Path to People folder (default: `./People`) |
-| `LLM_MODEL` | No | LLM model (default: `gpt-4o-mini`) |
-| `RUST_LOG` | No | Log level (default: `courage=info`) |
-
-## Development
-
-```bash
-# Run with debug logging
-RUST_LOG=courage=debug cargo run
-
-# Run tests
-cargo test
-
-# Check without building
-cargo check
-```
+Then interact with your bot on Telegram to add notes about people via text or voice messages.
 
 ## License
 
